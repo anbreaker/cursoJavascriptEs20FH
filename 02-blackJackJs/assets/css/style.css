@@ -1,0 +1,30 @@
+html,
+body {
+  margin: 0px;
+  background-color: #2f4f30;
+  color: white;
+}
+
+hr {
+  background-color: red;
+}
+
+.title {
+  text-align: center;
+  background-color: black;
+  color: white;
+  padding: 20px;
+  font-size: 25px;
+}
+
+.deck {
+  position: relative;
+  width: 150px;
+  left: 100px;
+  margin-left: -75px;
+}
+
+#computer-deck,
+#gamer-deck {
+  height: 240px;
+}
