@@ -1,135 +1,150 @@
-let deck = [];
-const types = ['C', 'D', 'H', 'S'];
-const bigCards = ['A', 'J', 'Q', 'K'];
+// Module Design Pattern.
+(() => {
+  ('use strict');
 
-let pointGamer = 0;
-let pointComputer = 0;
+  let deck = [];
+  const types = ['C', 'D', 'H', 'S'];
+  const bigCards = ['A', 'J', 'Q', 'K'];
 
-// HTML References
-const btnNewGame = document.querySelector('#newGame');
-const btnOrderCard = document.querySelector('#orderCard');
-const btnStop = document.querySelector('#stop');
+  let pointsPlayers = [];
 
-const divGamerDeck = document.querySelector('#gamer-deck');
-const divComputerDeck = document.querySelector('#computer-deck');
+  // HTML References
+  const btnNewGame = document.querySelector('#newGame');
+  const btnOrderCard = document.querySelector('#orderCard');
+  const btnStop = document.querySelector('#stop');
 
-const smallPointer = document.querySelectorAll('small');
+  const divCardsPlayers = document.querySelectorAll('.divCards');
+  const smallPointer = document.querySelectorAll('small');
 
-// New Deck
-const createDeck = () => {
-  for (let i = 2; i <= 10; i++) {
+  // main
+  const initGame = (numPlayers = 2) => {
+    deck = createDeck();
+
+    pointsPlayers = [];
+    for (let i = 0; i < numPlayers; i++) {
+      pointsPlayers.push(0);
+    }
+
+    smallPointer.forEach((element) => (element.innerText = 0));
+
+    divCardsPlayers.forEach((element) => (element.innerHTML = ''));
+
+    btnOrderCard.disabled = false;
+    btnStop.disabled = false;
+  };
+
+  // New Deck
+  const createDeck = () => {
+    deck = []; // Reset deck
+
+    for (let i = 2; i <= 10; i++) {
+      for (const type of types) {
+        deck.push(i + type);
+      }
+    }
+
     for (const type of types) {
-      deck.push(i + type);
+      for (const bigCard of bigCards) {
+        deck.push(bigCard + type);
+      }
     }
-  }
 
-  for (const type of types) {
-    for (const bigCard of bigCards) {
-      deck.push(bigCard + type);
-    }
-  }
+    return _.shuffle(deck);
+  };
 
-  // console.log(deck);
-  deck = _.shuffle(deck);
-  // console.log(deck);
+  const getCard = () => {
+    if (deck.length === 0) throw 'Deck Empty!';
 
-  return deck;
-};
+    return deck.pop();
+  };
 
-createDeck();
+  const getValueCard = (card) => {
+    const value = card.substring(0, card.length - 1);
 
-const getCard = () => {
-  if (deck.length === 0) throw 'Deck Empty!';
+    // CDSH --> 10; A --> 11
+    return isNaN(value) ? (value === 'A' ? 11 : 10) : Number(value);
+  };
 
-  const card = deck.pop();
+  // Turn -1 Last player is Computer
+  const counterPoint = (card, turn) => {
+    pointsPlayers[turn] += getValueCard(card);
 
-  return card;
-};
+    smallPointer[turn].innerText = pointsPlayers[turn];
 
-// getCard();
+    return pointsPlayers[turn];
+  };
 
-const getValueCard = (card) => {
-  const value = card.substring(0, card.length - 1);
-
-  // CDSH --> 10; A --> 11
-  return isNaN(value) ? (value === 'A' ? 11 : 10) : Number(value);
-};
-
-// Computer Turn
-const computerTurn = (pointMin) => {
-  do {
-    const card = getCard();
-
-    pointComputer += getValueCard(card);
-
-    smallPointer[1].innerText = pointComputer;
-
+  const createdCard = (card, turn) => {
     const imgCard = document.createElement('img');
     imgCard.src = `assets/cartas/${card}.png`;
     imgCard.classList.add('deck');
-    divComputerDeck.append(imgCard);
 
-    if (pointMin > 21) break;
-  } while (pointComputer < pointMin && pointMin <= 21);
+    divCardsPlayers[turn].append(imgCard);
+  };
 
-  setTimeout(() => {
-    if (pointComputer === pointMin) {
-      alert('Nobody Win! :(');
-    } else if (pointMin > 21) {
-      alert('Computer Win!');
-    } else if (pointComputer > 21) {
-      alert('Gamer Win!');
-    } else {
-      alert('Computer Win!');
+  const whoWin = () => {
+    const [pointMin, pointComputer] = pointsPlayers;
+
+    setTimeout(() => {
+      if (pointComputer === pointMin) {
+        alert('Nobody Win! :(');
+      } else if (pointMin > 21) {
+        alert('Computer Win!');
+      } else if (pointComputer > 21) {
+        alert('Gamer Win!');
+      } else {
+        alert('Computer Win!');
+      }
+    }, 100);
+  };
+
+  // Computer Turn
+  const computerTurn = (pointMin) => {
+    let pointComputer = 0;
+    const turn = pointsPlayers.length - 1;
+
+    do {
+      const card = getCard();
+
+      pointComputer = counterPoint(card, turn);
+
+      createdCard(card, turn);
+    } while (pointComputer < pointMin && pointMin <= 21);
+
+    whoWin();
+  };
+
+  // <------------ Events JsVanilla ------------>
+  btnOrderCard.addEventListener('click', () => {
+    const card = getCard();
+
+    const pointGamer = counterPoint(card, 0);
+
+    createdCard(card, 0);
+
+    if (pointGamer > 21) {
+      console.warn('You Lose!');
+
+      btnOrderCard.disabled = true;
+      btnStop.disabled = true;
+
+      computerTurn(pointGamer);
+    } else if (pointGamer === 21) {
+      console.warn('You Win!');
+
+      btnOrderCard.disabled = true;
+      btnStop.disabled = true;
     }
-  }, 100);
-};
+  });
 
-// Events JsVanilla
-btnOrderCard.addEventListener('click', () => {
-  const card = getCard();
-
-  pointGamer += getValueCard(card);
-
-  smallPointer[0].innerText = pointGamer;
-
-  const imgCard = document.createElement('img');
-  imgCard.src = `assets/cartas/${card}.png`;
-  imgCard.classList.add('deck');
-  divGamerDeck.append(imgCard);
-
-  if (pointGamer > 21) {
-    console.warn('You Lose!');
-    alert('Computer Win!');
-
+  btnStop.addEventListener('click', () => {
     btnOrderCard.disabled = true;
     btnStop.disabled = true;
-  } else if (pointGamer === 21) {
-    console.warn('You Win!');
 
-    btnOrderCard.disabled = true;
-    btnStop.disabled = true;
-  }
-});
+    computerTurn(pointsPlayers[0]);
+  });
 
-btnStop.addEventListener('click', () => {
-  btnOrderCard.disabled = true;
-  btnStop.disabled = true;
-  computerTurn(pointGamer);
-});
-
-btnNewGame.addEventListener('click', () => {
-  deck = [];
-  deck = createDeck();
-
-  pointGamer = 0;
-  pointComputer = 0;
-  smallPointer[0].innerHTML = 0;
-  smallPointer[1].innerHTML = 0;
-
-  divGamerDeck.innerHTML = '';
-  divComputerDeck.innerHTML = '';
-
-  btnOrderCard.disabled = false;
-  btnStop.disabled = false;
-});
+  btnNewGame.addEventListener('click', () => {
+    initGame();
+  });
+})();
