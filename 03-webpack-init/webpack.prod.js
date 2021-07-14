@@ -2,11 +2,15 @@ const HtmlWebPackPlugin = require('html-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 
+const CssMinimizerWebpackPlugin = require('css-minimizer-webpack-plugin');
+const TerserWebpackPlugin = require('terser-webpack-plugin');
+
 module.exports = {
-  mode: 'development',
+  mode: 'production',
 
   output: {
     clean: true,
+    filename: 'main.[fullhash].js',
   },
 
   module: {
@@ -15,8 +19,8 @@ module.exports = {
         test: /\.html$/i,
         loader: 'html-loader',
         options: {
-          sources: false,
-          minimize: false,
+          sources: true,
+          minimize: true,
         },
       },
 
@@ -48,6 +52,11 @@ module.exports = {
     ],
   },
 
+  optimization: {
+    minimize: true,
+    minimizer: [new CssMinimizerWebpackPlugin(), new TerserWebpackPlugin()],
+  },
+
   plugins: [
     new HtmlWebPackPlugin({
       template: './src/index.html',
@@ -60,7 +69,7 @@ module.exports = {
     }),
 
     new CopyWebpackPlugin({
-      patterns: [{ from: 'src/assets', to: 'assets/' }],
+      patterns: [{ from: 'src/assets', to: 'assets' }],
     }),
   ],
 };
