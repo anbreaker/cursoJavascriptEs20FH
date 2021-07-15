@@ -5,11 +5,12 @@ import { createTodoHtml } from './js/components';
 
 export const todoList = new TodoList();
 
-const todo1 = new Todo('learn Js');
-const todo2 = new Todo('Ride a motorbike!');
+// const todo1 = new Todo('learn Js');
 
-todoList.newTodo(todo1);
-// todoList.newTodo(todo2);
+// todoList.newTodo(todo1);
 
-createTodoHtml(todo1);
-// createTodoHtml(todo2);
+// createTodoHtml(todo1);
+
+console.log(todoList);
+
+todoList.todos.forEach(createTodoHtml);
