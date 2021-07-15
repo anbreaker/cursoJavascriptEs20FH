@@ -33,7 +33,30 @@ txtInput.addEventListener('keydown', (event) => {
 
     todoList.newTodo(newTask);
 
+    createTodoHtml(newTask);
     console.log(todoList);
+
     txtInput.value = '';
   }
+});
+
+divTodoList.addEventListener('click', (event) => {
+  const element = event.target.localName; //input, label, button.
+
+  const todoElement = event.target.parentElement.parentElement;
+  const todoId = todoElement.getAttribute('data-id');
+  console.log(todoId);
+
+  if (element.includes('input')) {
+    todoList.toggleTodoComplete(todoId);
+
+    todoElement.classList.toggle('completed');
+  } else if (element.includes('button')) {
+    todoList.deleteTodo(todoId);
+
+    divTodoList.removeChild(todoElement);
+  }
+
+  // TODO delete console.log
+  console.log(todoList);
 });
