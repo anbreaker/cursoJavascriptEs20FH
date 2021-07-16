@@ -15,11 +15,8 @@ export const searchHeroe = (id) => {
 export const searchHeroeAsync = async (id) => {
   const heroe = heroes[id];
 
-  if (heroe) {
-    return heroe;
-  } else {
-    throw `There is no hero with the id ${id}`;
-  }
+  if (heroe) return heroe;
+  else throw Error(`There is no hero with the id ${id}`);
 };
 
 const slowPromise = new Promise((resolve, reject) => {

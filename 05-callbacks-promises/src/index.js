@@ -1,5 +1,13 @@
+import { heroes } from './data/heroe';
+import {
+  getHeroeAwait,
+  getHeroesArr,
+  heroeIfAwait,
+  heroesCicle,
+  heroesIds,
+} from './js/await';
 import { searchHeroe as searchHeroeCB } from './js/callbacks';
-import { searchHeroe as searchHeroePR } from './js/promises';
+import { searchHeroe as searchHeroePR, searchHeroeAsync } from './js/promises';
 import './styles.css';
 
 // callback.js
@@ -44,3 +52,22 @@ fastPromise.then(console.log);
 Promise.race([slowPromise, mediumPromise, fastPromise])
   .then(console.log)
   .catch(console.warn);
+
+// Async vs promise
+searchHeroe('capi2').then(console.log).catch(console.warn);
+searchHeroeAsync('capi').then(console.log).catch(console.warn);
+
+//Await
+getHeroesArr().then(console.table);
+
+console.time('await');
+
+getHeroeAwait('capi2')
+  .then((heroe) => {
+    console.log(heroe);
+    console.timeEnd('await');
+  })
+  .catch(console.warn);
+
+heroesCicle();
+heroeIfAwait('iron');
